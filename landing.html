@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WANDER-BUDDY</title>
+  <style>
+    /* Reset & Body */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #89f7fe, #9ecdc3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* Landing Container */
+    .landing {
+      text-align: center;
+      max-width: 600px;
+      padding: 40px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 1.2s ease-in-out;
+    }
+
+    /* Heading */
+    .landing h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    /* Subtitle */
+    .landing p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+      color: #f0f0f0;
+    }
+
+    /* Start Button */
+    .start-btn {
+      padding: 14px 30px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 50px;
+      background: #66b497;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .start-btn:hover {
+      background: #ff4757;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(208, 168, 171, 0.4);
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Landing Page -->
+  <div class="landing">
+    <h1>✈️ WANDER-BUDDY</h1>
+    <p>Your ultimate AI travel guide.<br>
+      Discover destinations, plan trips, and explore the world with ease.</p>
+    <a href="chat.html">
+      <button class="start-btn">Start Exploring</button>
+    </a>
+  </div>
+</body>
+</html>
+
