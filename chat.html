@@ -1,309 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wander-Buddy — Travel Chatbot</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WANDER-BUDDY - Chat</title>
   <style>
-    :root{
-      --bg: #eed2cc;
-      --accent: #6c9a8b;    /* green teal */
-      --accent-2: #e8998d;  /* salmon */
-      --glass: rgba(251,247,244,0.92); /* off-white glass */
-      --text: #a1683a;      /* brown */
-      --muted: #6c9a8b;     /* green teal for muted */
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-      color:var(--text);
-      background: linear-gradient(120deg, #fbf7f4 0%, #eed2cc 60%, #e8998d 100%), var(--bg);
-      background-attachment: fixed;
-    }
-    /* Subtle travel background */
-    body::before{
-      content:"";
-      position:fixed; inset:0;
-      background-image: url('https://t4.ftcdn.net/jpg/00/65/48/25/360_F_65482539_C0ZozE5gUjCafz7Xq98WB4dW6LAhqKfs.jpg');
-      background-size: cover; background-position: center;
-      filter: brightness(0.92) saturate(1.1) blur(1px);
-      z-index:-2;
-    }
-    body::after{
-      content:"";
-      position:fixed; inset:0;
-      background: radial-gradient(60% 60% at 50% 10%, rgba(108,154,139,0.10), transparent 60%),
-                  radial-gradient(40% 40% at 20% 80%, rgba(232,153,141,0.10), transparent 60%);
-      z-index:-1;
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
     }
 
-    .container{
-      min-height:100%;
-      display:flex; align-items:center; justify-content:center;
-      padding:24px;
-    }
-    .chat-card{
-      width: min(960px, 100%);
-      height: min(78vh, 820px);
-      display:flex; flex-direction:column;
-      background: linear-gradient(180deg, rgba(232, 222, 218, 0.98), rgba(251,247,244,0.92));
-      border: 1px solid rgba(108,154,139,0.18);
-      backdrop-filter: blur(1px);
-      -webkit-backdrop-filter: blur(6px);
-      border-radius: 24px;
-      box-shadow: 0 10px 40px rgba(206, 159, 151, 0.1);
+    .chat-container {
+      width: 400px;
+      max-height: 90vh;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
-    }
-    .header{
-      padding: 18px 20px;
-      display:flex; align-items:center; gap:12px;
-      border-bottom: 1px solid rgba(232,153,141,0.18);
-      background: rgba(232,153,141,0.10);
-    }
-    .logo{
-      width:40px; height:40px; border-radius:12px;
-      display:grid; place-items:center;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color:#fff; font-weight:800;
-      box-shadow: 0 6px 20px rgba(232,153,141,0.18);
-    }
-    .title{
-      font-weight:700; letter-spacing: 0.3px; font-size: 18px;
-    }
-    .subtitle{color:var(--muted); font-size: 13px}
-
-    .messages{
-      flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:14px;
-      scroll-behavior:smooth;
-    }
-    .hintbar{
-      display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px;
-    }
-    .pill{
-      border:1px solid rgba(82, 142, 122, 0.18);
-      background: rgba(232,153,141,0.10);
-      color:var(--text);
-      padding:8px 12px; border-radius:999px; font-size:12px; cursor:pointer;
-      transition: .15s ease transform, .2s ease background;
-    }
-    .pill:hover{ background: rgba(232,153,141,0.22); transform: translateY(-1px) }
-
-    .bubble{ max-width: 72%; padding:12px 14px; border-radius:16px; line-height:1.45; font-size:15px; position:relative; }
-    .bot{ align-self:flex-start; background: rgba(232,153,141,0.10); border:1px solid rgba(108,154,139,0.18)}
-    .user{ align-self:flex-end; background: linear-gradient(135deg, var(--accent-2), var(--accent)); color:#fff; font-weight:600 }
-
-    .meta{ display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px; margin-top:4px }
-
-    .typing{ display:inline-flex; gap:4px; align-items:center }
-    .dot{ width:6px; height:6px; border-radius:50%; background: var(--accent); opacity:.3; animation: blink 1s infinite }
-    .dot:nth-child(2){ animation-delay:.15s }
-    .dot:nth-child(3){ animation-delay:.3s }
-    @keyframes blink{ 0%, 80%, 100%{opacity:.2} 40%{opacity:1} }
-
-    .inputbar{
-      padding:14px; display:flex; gap:10px; align-items:center; border-top:1px solid rgba(232,153,141,0.18); background: rgba(232,153,141,0.10);
-    }
-    .field{
-      flex:1; display:flex; align-items:center; gap:10px; background: rgba(251,247,244,0.92); border:1px solid rgba(108,154,139,0.18); border-radius:999px; padding:10px 14px;
-    }
-    input[type="text"]{
-      flex:1; background: transparent; border:0; outline:0; color:var(--text);
-      font-size:15px;
-    }
-    .btn{
-      border:0; cursor:pointer; border-radius:999px; padding:10px 14px; font-weight:700; letter-spacing:.2px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff;
-      box-shadow: 0 8px 24px rgba(232,153,141,0.18);
-      transition: .15s ease transform, .2s ease box-shadow, .2s ease opacity;
-    }
-    .btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 30px rgba(232,153,141,0.28) }
-    .btn.secondary{ background: rgba(232,153,141,0.10); color:var(--text); box-shadow: none; border:1px solid rgba(108,154,139,0.18) }
-    .btn.secondary:hover{ background: rgba(232,153,141,0.22) }
-
-    .card-suggestion{
-      margin-top:8px; border:1px solid rgba(108,154,139,0.18); background: rgba(232,153,141,0.10); border-radius:16px; padding:10px 12px; font-size:14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
 
-    /* Mobile tweaks */
-    @media (max-width: 640px){
-      .chat-card{ height: calc(100vh - 32px) }
-      .bubble{ max-width: 86% }
-      .subtitle{ display:none }
+    .chat-header {
+      padding: 15px;
+      background: #00000080;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .chat-box {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 80%;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .user {
+      background: #66b497;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background: #444;
+      align-self: flex-start;
+    }
+
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #666;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    .chat-input button {
+      padding: 12px 20px;
+      background: #66b497;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      color: #fff;
+      transition: 0.3s;
+    }
+
+    .chat-input button:hover {
+      background: #ff4757;
+    }
+
+    .typing {
+      font-style: italic;
+      color: #ccc;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="chat-card" id="app">
-      <div class="header">
-        <div class="logo">✈️</div>
-        <div>
-          <div class="title">WANDER-BUDDY</div>
-          <div class="subtitle">Your friendly travel chat assistant</div>
-        </div>
-        <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
-          <button class="btn secondary" id="surprise">🎲 Surprise me</button>
-          <button class="btn secondary" id="clear">🧹 Clear chat</button>
-        </div>
-      </div>
-
-      <div class="messages" id="messages">
-        <div class="hintbar" id="hints"></div>
-      </div>
-
-      <div class="inputbar">
-        <div class="field">
-          <input type="text" id="input" placeholder="Tell me your month, budget, and vibe… e.g., Goa in December under 15k" autocomplete="off" />
-        </div>
-        <button class="btn" id="send">Send</button>
-      </div>
+  <div class="chat-container">
+    <div class="chat-header">✈️ Mr. Wander-Buddy</div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Ask me about travel...">
+      <button onclick="send()">Send</button>
     </div>
   </div>
 
-<script>
-// --- Tiny rule-based brain + pleasant UI for demo-ready MVP ---
-const messagesEl = document.getElementById('messages');
-const inputEl = document.getElementById('input');
-const sendBtn = document.getElementById('send');
-const clearBtn = document.getElementById('clear');
-const surpriseBtn = document.getElementById('surprise');
-const hintsEl = document.getElementById('hints');
+  <script>
+    const chatBox = document.getElementById('chatBox');
 
-// Demo destinations (expandable)
-const DESTS = [
-  { id:'goa', name:'Goa', country:'India', emoji:'🏖️', vibe:['beach','party','relax'], months:['nov','dec','jan','feb'], temp:'24–30°C', budget:12000, notes:['Sunset at Anjuna','Try Goan fish curry','Scooter rentals are cheap'] },
-  { id:'manali', name:'Manali', country:'India', emoji:'🏔️', vibe:['mountains','scenic','chill'], months:['mar','apr','sep','oct'], temp:'10–20°C', budget:14000, notes:['Solang Valley cable car','Café hopping in Old Manali','Pack a light jacket'] },
-  { id:'paris', name:'Paris', country:'France', emoji:'🗼', vibe:['romantic','city','culture'], months:['apr','may','sep','oct','dec'], temp:'5–18°C', budget:55000, notes:['Louvre skip-the-line','Seine cruise at sunset','Try a croissant near the river'] },
-  { id:'tokyo', name:'Tokyo', country:'Japan', emoji:'🗾', vibe:['tech','city','food'], months:['mar','apr','oct','nov'], temp:'8–22°C', budget:70000, notes:['Sushi at Tsukiji','TeamLab art museum','Suica card for transit'] },
-];
+    function addMessage(sender, text) {
+      const msg = document.createElement('div');
+      msg.classList.add('message', sender);
+      msg.innerText = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return msg;
+    }
 
-const HINTS = [
-  'Beach in December under 15000',
-  'Mountains in October around 12000',
-  'Romantic city in April, budget 60k',
-  'Food + tech vibes in November',
-];
+    function addTyping() {
+      const msg = document.createElement('div');
+      msg.classList.add('message', 'bot', 'typing');
+      msg.innerText = "Mr. Wander-Buddy is typing...";
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return msg;
+    }
 
-const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    async function typeInto(element, text, speed = 20) {
+      for (let i = 0; i < text.length; i++) {
+        element.innerText += text[i];
+        await new Promise(r => setTimeout(r, speed));
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
 
-function slug(s){return s.toLowerCase()}
-function extractBudget(text){ const m = text.replace(/,/g,'').match(/(\d{2,6})\s*(k|₹)?/i); if(!m) return null; let n = parseInt(m[1],10); if(m[2]==='k') n*=1000; return n }
-function extractMonth(text){ const t = slug(text); for(const m of MONTHS){ if(t.includes(m)) return m } return null }
-function findVibe(text){ const t = slug(text); if(/beach|island|sea|sun/i.test(text)) return 'beach'; if(/mountain|hills|snow|trek|scenic/i.test(text)) return 'mountains'; if(/city|nightlife|party|club/i.test(text)) return 'city'; if(/romantic|honeymoon|love/i.test(text)) return 'romantic'; if(/food|sushi|street|tech/i.test(text)) return 'food'; return null }
+    async function botReply(userText) {
+      const tnode = addTyping();
 
-function pickDest({month, budget, vibe}){
-  let candidates = DESTS.slice();
-  if(month) candidates = candidates.filter(d => d.months.includes(month));
-  if(vibe){
-    candidates = candidates.filter(d => d.vibe.includes(vibe) || (vibe==='city' && d.vibe.includes('city')));
-  }
-  if(budget){
-    candidates = candidates.sort((a,b)=> Math.abs(a.budget-budget) - Math.abs(b.budget-budget));
-    candidates = candidates.filter(d => d.budget <= budget*1.2 || budget>50000); // be lenient
-  }
-  if(candidates.length===0) candidates = DESTS.slice();
-  return candidates[0];
-}
+      try {
+        const res = await fetch("/.netlify/functions/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userText })
+        });
 
-function el(tag, cls, html){ const e = document.createElement(tag); if(cls) e.className = cls; if(html) e.innerHTML = html; return e }
+        const data = await res.json();
+        tnode.remove();
 
-function addMessage(role, html){
-  const wrap = el('div', `bubble ${role}`); wrap.innerHTML = html; messagesEl.appendChild(wrap); messagesEl.scrollTop = messagesEl.scrollHeight; return wrap;
-}
+        const b = addMessage('bot', '');
+        await typeInto(b, data.reply, 15);
 
-function addTyping(){
-  const b = el('div','bubble bot');
-  const dots = el('span','typing');
-  dots.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
-  b.appendChild(dots); messagesEl.appendChild(b); messagesEl.scrollTop = messagesEl.scrollHeight; return b;
-}
+      } catch (err) {
+        tnode.remove();
+        addMessage('bot', "⚠️ Sorry, I couldn't connect to AI right now.");
+        console.error(err);
+      }
+    }
 
-function typeInto(elm, text, speed=12){
-  return new Promise(res=>{
-    let i=0; const timer=setInterval(()=>{ elm.innerHTML = text.slice(0, ++i); messagesEl.scrollTop = messagesEl.scrollHeight; if(i>=text.length){ clearInterval(timer); res() } }, speed);
-  })
-}
+    function send() {
+      const input = document.getElementById('userInput');
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage('user', text);
+      input.value = '';
+      botReply(text);
+    }
 
-function cardForDest(d){
-  const items = d.notes.map(n=>`• ${n}`).join('<br>');
-  return `
-    <div><strong>${d.emoji} ${d.name}, ${d.country}</strong></div>
-    <div class="card-suggestion">
-      <div><strong>Best months:</strong> ${d.months.map(m=>m.toUpperCase()).join(', ')}</div>
-      <div><strong>Avg temp:</strong> ${d.temp}</div>
-      <div><strong>Budget:</strong> ~₹${d.budget.toLocaleString()}</div>
-      <div style="margin-top:6px">${items}</div>
-    </div>
-  `
-}
-
-async function botReply(userText){
-  const tnode = addTyping();
-  // Parse
-  const month = extractMonth(userText) || null;
-  const budget = extractBudget(userText);
-  const vibe = findVibe(userText);
-  const dest = pickDest({month, budget, vibe});
-
-  const intro = `Here’s a plan I think you’ll love ${dest.emoji}`;
-  const details = cardForDest(dest);
-  const tip = month && !dest.months.includes(month)
-    ? `Heads up: ${dest.name} isn't ideal in ${month.toUpperCase()}, but it's still doable. Want alternatives?`
-    : `Want me to suggest stay options or a 2‑day plan?`;
-  const out = `${intro}<br>${details}<br>${tip}`;
-
-  // Fake thinking delay
-  await new Promise(r => setTimeout(r, 700 + Math.random()*600));
-  tnode.remove();
-
-  const b = addMessage('bot', '');
-  await typeInto(b, out, 1); // fast type for rich HTML
-}
-
-function send(){
-  const val = inputEl.value.trim(); if(!val) return;
-  addMessage('user', val);
-  inputEl.value='';
-  botReply(val);
-}
-
-sendBtn.addEventListener('click', send);
-inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); send() } });
-clearBtn.addEventListener('click', ()=>{ messagesEl.innerHTML=''; intro(); });
-
-surpriseBtn.addEventListener('click', ()=>{
-  const samples = [
-    'Beach in December under 15000',
-    'Mountains in October around 12000',
-    'Paris in April with romantic vibe, budget 60000',
-    'Tokyo in November for food + tech'
-  ];
-  const q = samples[Math.floor(Math.random()*samples.length)];
-  addMessage('user', q);
-  botReply(q);
-});
-
-function addHints(){
-  hintsEl.innerHTML='';
-  HINTS.forEach(h=>{
-    const p = el('button','pill',h); p.addEventListener('click',()=>{ addMessage('user', h); botReply(h) });
-    hintsEl.appendChild(p);
-  })
-}
-
-function intro(){
-  addHints();
-  const greet = addMessage('bot', 'Hi! I\'m <strong>WANDER BUDDY</strong> 🗺️\u00A0— your travel chat pal. Tell me your <em>month</em>, <em>budget</em>, and <em>vibe</em>, and I\'ll suggest a plan ✈️');
-}
-
-// Initialize
-intro();
-</script>
+    // Intro message
+    window.onload = () => {
+      addMessage('bot', "👋 Hi, I’m Mr. Wander-Buddy! Ask me anything about travel ✈️🌍");
+    };
+  </script>
 </body>
 </html>
+
 
