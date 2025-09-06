@@ -27,4 +27,3 @@ export async function handler(event) {
     return { statusCode: 500, body: "Error: " + error.message };
   }
 }
-
