@@ -259,7 +259,7 @@ async function botReply(userText) {
     await typeInto(b, data.reply, 15); // typewriter effect for AI reply
   } catch (err) {
     tnode.remove();
-    addMessage('bot', "⚠️ Sorry, something went wrong connecting to AI.");
+    addMessage('bot', "⚠️ Sorry, something went wrong connecting to AI. Please try again later.");
     console.error(err);
   }
 }
