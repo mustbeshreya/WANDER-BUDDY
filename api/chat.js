@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = JSON.parse(req.body);
+    const { message } = req.body; // <-- Use req.body directly
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -14,11 +14,16 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        messages: [{ role: "user", content: body.message }],
+        messages: [{ role: "user", content: message }],
       })
     });
 
     const data = await response.json();
+
+    // Add a check for OpenAI errors
+    if (!data.choices || !data.choices[0]?.message?.content) {
+      return res.status(500).json({ reply: "Sorry, I couldn't get a reply from AI." });
+    }
 
     res.status(200).json({ reply: data.choices[0].message.content });
   } catch (error) {
