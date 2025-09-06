@@ -242,27 +242,26 @@ function cardForDest(d){
   `
 }
 
-async function botReply(userText){
+async function botReply(userText) {
   const tnode = addTyping();
-  // Parse
-  const month = extractMonth(userText) || null;
-  const budget = extractBudget(userText);
-  const vibe = findVibe(userText);
-  const dest = pickDest({month, budget, vibe});
 
-  const intro = `Here’s a plan I think you’ll love ${dest.emoji}`;
-  const details = cardForDest(dest);
-  const tip = month && !dest.months.includes(month)
-    ? `Heads up: ${dest.name} isn't ideal in ${month.toUpperCase()}, but it's still doable. Want alternatives?`
-    : `Want me to suggest stay options or a 2‑day plan?`;
-  const out = `${intro}<br>${details}<br>${tip}`;
+  try {
+    const res = await fetch("/.netlify/functions/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userText })
+    });
 
-  // Fake thinking delay
-  await new Promise(r => setTimeout(r, 700 + Math.random()*600));
-  tnode.remove();
+    const data = await res.json();
+    tnode.remove();
 
-  const b = addMessage('bot', '');
-  await typeInto(b, out, 1); // fast type for rich HTML
+    const b = addMessage('bot', '');
+    await typeInto(b, data.reply, 15); // typewriter effect for AI reply
+  } catch (err) {
+    tnode.remove();
+    addMessage('bot', "⚠️ Sorry, something went wrong connecting to AI.");
+    console.error(err);
+  }
 }
 
 function send(){
