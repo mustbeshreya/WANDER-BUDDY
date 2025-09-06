@@ -164,9 +164,8 @@
       </div>
     </div>
   </div>
-
+  
 <script>
-// --- Tiny rule-based brain + pleasant UI for demo-ready MVP ---
 const messagesEl = document.getElementById('messages');
 const inputEl = document.getElementById('input');
 const sendBtn = document.getElementById('send');
@@ -174,41 +173,13 @@ const clearBtn = document.getElementById('clear');
 const surpriseBtn = document.getElementById('surprise');
 const hintsEl = document.getElementById('hints');
 
-// Demo destinations (expandable)
-const DESTS = [
-  { id:'goa', name:'Goa', country:'India', emoji:'🏖️', vibe:['beach','party','relax'], months:['nov','dec','jan','feb'], temp:'24–30°C', budget:12000, notes:['Sunset at Anjuna','Try Goan fish curry','Scooter rentals are cheap'] },
-  { id:'manali', name:'Manali', country:'India', emoji:'🏔️', vibe:['mountains','scenic','chill'], months:['mar','apr','sep','oct'], temp:'10–20°C', budget:14000, notes:['Solang Valley cable car','Café hopping in Old Manali','Pack a light jacket'] },
-  { id:'paris', name:'Paris', country:'France', emoji:'🗼', vibe:['romantic','city','culture'], months:['apr','may','sep','oct','dec'], temp:'5–18°C', budget:55000, notes:['Louvre skip-the-line','Seine cruise at sunset','Try a croissant near the river'] },
-  { id:'tokyo', name:'Tokyo', country:'Japan', emoji:'🗾', vibe:['tech','city','food'], months:['mar','apr','oct','nov'], temp:'8–22°C', budget:70000, notes:['Sushi at Tsukiji','TeamLab art museum','Suica card for transit'] },
-];
-
+// Sample hints for quick input
 const HINTS = [
   'Beach in December under 15000',
   'Mountains in October around 12000',
   'Romantic city in April, budget 60k',
   'Food + tech vibes in November',
 ];
-
-const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-
-function slug(s){return s.toLowerCase()}
-function extractBudget(text){ const m = text.replace(/,/g,'').match(/(\d{2,6})\s*(k|₹)?/i); if(!m) return null; let n = parseInt(m[1],10); if(m[2]==='k') n*=1000; return n }
-function extractMonth(text){ const t = slug(text); for(const m of MONTHS){ if(t.includes(m)) return m } return null }
-function findVibe(text){ const t = slug(text); if(/beach|island|sea|sun/i.test(text)) return 'beach'; if(/mountain|hills|snow|trek|scenic/i.test(text)) return 'mountains'; if(/city|nightlife|party|club/i.test(text)) return 'city'; if(/romantic|honeymoon|love/i.test(text)) return 'romantic'; if(/food|sushi|street|tech/i.test(text)) return 'food'; return null }
-
-function pickDest({month, budget, vibe}){
-  let candidates = DESTS.slice();
-  if(month) candidates = candidates.filter(d => d.months.includes(month));
-  if(vibe){
-    candidates = candidates.filter(d => d.vibe.includes(vibe) || (vibe==='city' && d.vibe.includes('city')));
-  }
-  if(budget){
-    candidates = candidates.sort((a,b)=> Math.abs(a.budget-budget) - Math.abs(b.budget-budget));
-    candidates = candidates.filter(d => d.budget <= budget*1.2 || budget>50000); // be lenient
-  }
-  if(candidates.length===0) candidates = DESTS.slice();
-  return candidates[0];
-}
 
 function el(tag, cls, html){ const e = document.createElement(tag); if(cls) e.className = cls; if(html) e.innerHTML = html; return e }
 
@@ -223,23 +194,10 @@ function addTyping(){
   b.appendChild(dots); messagesEl.appendChild(b); messagesEl.scrollTop = messagesEl.scrollHeight; return b;
 }
 
-function typeInto(elm, text, speed=12){
+function typeInto(elm, text, speed=15){
   return new Promise(res=>{
     let i=0; const timer=setInterval(()=>{ elm.innerHTML = text.slice(0, ++i); messagesEl.scrollTop = messagesEl.scrollHeight; if(i>=text.length){ clearInterval(timer); res() } }, speed);
   })
-}
-
-function cardForDest(d){
-  const items = d.notes.map(n=>`• ${n}`).join('<br>');
-  return `
-    <div><strong>${d.emoji} ${d.name}, ${d.country}</strong></div>
-    <div class="card-suggestion">
-      <div><strong>Best months:</strong> ${d.months.map(m=>m.toUpperCase()).join(', ')}</div>
-      <div><strong>Avg temp:</strong> ${d.temp}</div>
-      <div><strong>Budget:</strong> ~₹${d.budget.toLocaleString()}</div>
-      <div style="margin-top:6px">${items}</div>
-    </div>
-  `
 }
 
 async function botReply(userText) {
