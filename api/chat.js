@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message } = req.body; // <-- Use req.body directly
+    const { message } = req.body;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -20,7 +20,9 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Add a check for OpenAI errors
+    // Log the full OpenAI response for debugging
+    console.log(data);
+
     if (!data.choices || !data.choices[0]?.message?.content) {
       return res.status(500).json({ reply: "Sorry, I couldn't get a reply from AI." });
     }
